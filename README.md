@@ -3,8 +3,8 @@
 ## Student Information
 | Field | Details |
 |-------|---------|
-| **Student Name** | Philip [Your Surname] |
-| **Registration Number** | [Your Reg Number e.g. 23BIT012] |
+| **Student Name** | Philip Mujuzi |
+| **Registration Number** | 25BSIT0253 |
 | **Project Title** | LibriTrack Library Management System |
 | **Institution** | University of Kisubi (UNiK) |
 
