@@ -116,3 +116,40 @@ INSERT INTO notices (title, body) VALUES
 ('Welcome to LibriTrack!', 'The University of Kisubi library system is now live. You can check your borrowed books, due dates, and more through this portal.'),
 ('Library Hours', 'The library is open Monday to Friday 8am – 8pm, and Saturday 9am – 5pm. Closed on Sundays and public holidays.'),
 ('Fine Policy', 'Overdue books are charged UGX 500 per day. Please return books on time to avoid fines.');
+
+-- ============================================================
+-- Assignment 4: tbl_content (Dynamic Featured Books)
+-- id, title, description, image_url as required
+-- ============================================================
+CREATE TABLE IF NOT EXISTS tbl_content (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    title       VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    image_url   VARCHAR(500) NOT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO tbl_content (title, description, image_url) VALUES
+('Kintu',
+ 'A sweeping Ugandan epic by Jennifer Nansubuga Makumbi tracing the descendants of Kintu Kidda through centuries of family curses and redemption. A landmark of African literature.',
+ 'https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1486840973i/31944671.jpg'),
+
+('Song of Lawino',
+ 'Okot p''Bitek''s celebrated poem narrated by Lawino, a traditional Acholi woman lamenting her husband''s rejection of African culture in favour of Western ways.',
+ 'https://betweenthecovers.cdn.bibliopolis.com/pictures/586052.jpg?auto=webp&v=1720724181'),
+
+('Things Fall Apart',
+ 'Chinua Achebe''s masterpiece about Okonkwo, a proud Igbo warrior, and the collapse of traditional society under colonial rule. One of the most widely read African novels.',
+ 'https://betweenthecovers.cdn.bibliopolis.com/pictures/560640.jpg?auto=webp&v=1701374615'),
+
+('Long Walk to Freedom',
+ 'Nelson Mandela''s autobiography — from his rural childhood through 27 years in prison to his presidency. An inspiring account of perseverance, sacrifice and justice.',
+ 'https://g.christianbook.com/g/slideshow/5/548182/main/548182_1_ftc.jpg'),
+
+('Introduction to Algorithms',
+ 'The definitive textbook on computer algorithms by Cormen et al. Covers sorting, data structures, graph algorithms and complexity. Essential for all IT students.',
+ 'https://miro.medium.com/v2/resize:fit:720/format:webp/1*tDC1ojhd2zFhVaNZvNeKUA.jpeg'),
+
+('Python Crash Course',
+ 'A beginner-friendly introduction to programming with Python by Eric Matthes. Covers variables, loops, functions and real-world projects. Perfect for first-year IT students.',
+ 'https://i5.walmartimages.com/seo/Python-Crash-Course-2nd-Edition-A-Hands-On-Project-Based-Introduction-to-Programming-Paperback-9781593279288_410f2915-a902-4cc5-8713-0f007907e37e.58bcfec84fa73bf063f2a455e2d306df.jpeg');

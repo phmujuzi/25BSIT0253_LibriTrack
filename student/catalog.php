@@ -1,83 +1,93 @@
 <?php
+// ============================================================
+// catalog.php — Dynamic Featured Books
+// Assignment 4: From Static to Data-Driven
+// Uses tbl_content fetched via a while loop
+// ============================================================
+require_once '../db_connect.php';        // separate config file
 require_once '../includes/config.php';
 requireStudent();
 
-$search = trim($_GET['search'] ?? '');
-$cat    = trim($_GET['category'] ?? '');
-
-$where = [];
-if ($search) {
-    $s = $conn->real_escape_string($search);
-    $where[] = "(title LIKE '%$s%' OR author LIKE '%$s%')";
-}
-if ($cat) {
-    $c = $conn->real_escape_string($cat);
-    $where[] = "category = '$c'";
-}
-$whereSQL = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-
-$books = $conn->query("SELECT * FROM books $whereSQL ORDER BY title ASC")->fetch_all(MYSQLI_ASSOC);
-$categories = $conn->query("SELECT DISTINCT category FROM books ORDER BY category")->fetch_all(MYSQLI_ASSOC);
+// Fetch all rows from tbl_content
+$result = $conn->query(
+    "SELECT id, title, description, image_url FROM tbl_content ORDER BY id ASC"
+);
 
 include 'partials/header.php';
 ?>
 
-<div class="page-title">Browse Catalog</div>
-
-<form method="GET" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
-    <input type="text" name="search" placeholder="🔍 Search by title or author…"
-           value="<?= htmlspecialchars($search) ?>"
-           style="flex:1;min-width:200px;padding:9px 14px;border:1px solid #ddd;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13.5px;outline:none">
-    <select name="category"
-            style="padding:9px 14px;border:1px solid #ddd;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13.5px;outline:none">
-        <option value="">All Categories</option>
-        <?php foreach ($categories as $c): ?>
-        <option value="<?= htmlspecialchars($c['category']) ?>" <?= $cat===$c['category']?'selected':'' ?>>
-            <?= htmlspecialchars($c['category']) ?>
-        </option>
-        <?php endforeach; ?>
-    </select>
-    <button type="submit" class="btn btn-green">Search</button>
-    <?php if ($search || $cat): ?>
-    <a href="catalog.php" class="btn" style="background:#f0f0f0;color:#555">Clear</a>
-    <?php endif; ?>
-</form>
-
-<div class="card">
-    <div class="card-head">Books (<?= count($books) ?>)</div>
-    <table>
-        <thead>
-            <tr><th>Title</th><th>Author</th><th>Category</th><th>Shelf</th><th>Availability</th></tr>
-        </thead>
-        <tbody>
-        <?php foreach ($books as $b): ?>
-        <tr>
-            <td>
-                <strong><?= htmlspecialchars($b['title']) ?></strong>
-                <?php if ($b['isbn']): ?><small>ISBN: <?= htmlspecialchars($b['isbn']) ?></small><?php endif; ?>
-            </td>
-            <td><?= htmlspecialchars($b['author']) ?></td>
-            <td>
-                <span style="background:#e8f5ee;color:#1b4332;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600">
-                    <?= htmlspecialchars($b['category']) ?>
-                </span>
-            </td>
-            <td><?= htmlspecialchars($b['shelf'] ?: '—') ?></td>
-            <td>
-                <?php if ($b['copies_available'] > 0): ?>
-                <span style="color:#27ae60;font-weight:700">✓ <?= $b['copies_available'] ?> available</span>
-                <?php else: ?>
-                <span style="color:#e74c3c;font-weight:700">✗ All out</span>
-                <?php endif; ?>
-                <small><?= $b['copies_total'] ?> total copies</small>
-            </td>
-        </tr>
-        <?php endforeach; ?>
-        <?php if (empty($books)): ?>
-        <tr><td colspan="5" style="text-align:center;padding:32px;color:#aaa">No books found</td></tr>
-        <?php endif; ?>
-        </tbody>
-    </table>
+<div class="page-title">
+    Featured Books
+    <span style="display:inline-block;background:#1b4332;color:#fff;padding:3px 12px;
+                 border-radius:20px;font-size:12px;font-weight:600;margin-left:8px;vertical-align:middle">
+        <?= $result ? $result->num_rows : 0 ?> books
+    </span>
 </div>
+<p style="color:#888;font-size:13.5px;margin-bottom:24px">
+    Recommended reading from the UNiK Library collection
+</p>
+
+<!-- Book cards grid -->
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px">
+
+<?php
+// -------------------------------------------------------
+// DYNAMIC LOOP — fetches every row from tbl_content
+// and injects it into a single HTML card template.
+// Add a new row in phpMyAdmin → appears here instantly.
+// -------------------------------------------------------
+if ($result && $result->num_rows > 0) {
+
+    while ($row = $result->fetch_assoc()) {
+?>
+    <div style="background:#fff;border-radius:14px;overflow:hidden;
+                box-shadow:0 2px 8px rgba(0,0,0,.06);
+                transition:transform .2s,box-shadow .2s"
+         onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.1)'"
+         onmouseout="this.style.transform='';this.style.boxShadow='0 2px 8px rgba(0,0,0,.06)'">
+
+        <img src="<?= htmlspecialchars($row['image_url']) ?>"
+             alt="<?= htmlspecialchars($row['title']) ?>"
+             onerror="this.src='https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=400&q=80'"
+             style="width:100%;height:170px;object-fit:cover;display:block">
+
+        <div style="padding:16px">
+            <div style="font-size:11px;font-weight:700;color:#c8961e;
+                        text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">
+                Book #<?= $row['id'] ?>
+            </div>
+            <div style="font-family:'Playfair Display',serif;font-size:16px;
+                        font-weight:700;color:#111;margin-bottom:7px;line-height:1.3">
+                <?= htmlspecialchars($row['title']) ?>
+            </div>
+            <div style="font-size:13px;color:#666;line-height:1.6">
+                <?= htmlspecialchars($row['description']) ?>
+            </div>
+        </div>
+    </div>
+<?php
+    } // end while
+
+} else {
+    // -------------------------------------------------------
+    // EMPTY STATE — handles "No records found" scenario
+    // -------------------------------------------------------
+?>
+    <div style="grid-column:1/-1;text-align:center;padding:60px 20px;
+                background:#fff;border-radius:14px;color:#aaa">
+        <div style="font-size:48px;margin-bottom:12px">📭</div>
+        <h3 style="font-size:18px;color:#888;margin-bottom:8px">No Records Found</h3>
+        <p style="font-size:13.5px">
+            No featured books yet.<br>
+            Add rows to the <strong>tbl_content</strong> table in phpMyAdmin to display books here.
+        </p>
+    </div>
+<?php
+}
+
+if ($result) $result->free();
+?>
+
+</div><!-- /grid -->
 
 <?php include 'partials/footer.php'; ?>
